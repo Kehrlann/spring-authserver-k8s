@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: authserver
+  name: authserver
+  namespace: authserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authserver
+  template:
+    metadata:
+      labels:
+        app: authserver
+    spec:
+      containers:
+      - image: springone/authserver
+        name: authserver
+        ports:
+          - containerPort: 8080
+            name: authserver
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: authserver
+  namespace: authserver
+spec:
+  type: ClusterIP
+  selector:
+    app: authserver
+  ports:
+    - name: authserver
+      port: 8080
+      targetPort: authserver

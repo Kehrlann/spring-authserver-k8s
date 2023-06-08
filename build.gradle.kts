@@ -21,3 +21,8 @@ dependencies {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
+tasks.bootBuildImage {
+	environment.put("BP_LIVE_RELOAD_ENABLED", "true")
+	builder.set("dashaun/builder")
+}
