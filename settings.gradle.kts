@@ -1,1 +1,4 @@
-rootProject.name = "authserver-k8s"
+rootProject.name = "k8s-experiments"
+
+include("authserver")
+include("k8s-experiments")

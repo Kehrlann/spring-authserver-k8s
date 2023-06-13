@@ -1,0 +1,12 @@
+#@ load("@ytt:data","data")
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: #@ "signing-key-" + data.values.uuid
+  namespace: authserver
+  labels:
+    security.spring.io/key-usage: #@ "signing" if "signing" in data.values else "verification"
+stringData:
+  key.pem: #@ data.values.key_pem
+type: authserver/jwk

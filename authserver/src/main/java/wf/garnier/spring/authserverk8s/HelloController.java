@@ -1,5 +1,7 @@
 package wf.garnier.spring.authserverk8s;
 
+import java.security.interfaces.RSAKey;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

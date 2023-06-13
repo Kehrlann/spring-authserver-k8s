@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: default-key
+  namespace: authserver
+  labels:
+    security.spring.io/key-usage: signing
+stringData:
+  key.pem: |-
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEpAIBAAKCAQEA0aDEnbQ4ypSFl9lQiwiNMIF9Z5H0dyniqZC7oJzLzBVvL2XT
+    B/tPaRmlXnE2A4LLM8FBiUQ+2DfOCjW72HEFaFgZjezGp6g0BjVvnHKkwRxfuNDz
+    VKlCBqCIrEjcJY/Ab1eaTf4DHziWHBLZFf3uYo7z8kF0ujSGjP/ybksB+p0emlKC
+    XAcocAZJK524Ju51ionJr6YK/A9WvxCo02VuR6eYckAA1xc4Bmb/MO0Nsp80TLUi
+    BLZUHY7lpzQ05MPUW9Lzt2rDksYb2+/tFVmbus0ZeccjtycJ2+nK7xrszC/W8eis
+    uHFSLpvblqzxuPNCjrrxttFjcOSCIPHyKDfXywIDAQABAoIBAGmYl5Jtd3IssMMW
+    OClhLGYzxG0Iq+HfGouaGbnFYi+y2GhC3bQWlyD1R0U0uCW6nAu9HPs9gn6+Va70
+    9GQKQtQWFQFWNZe89j/uaQOhCHcyiNF7iCesf1MBSPeoWCUfrasosNT60K3Ifm0z
+    3WDjolLJef8dk+Q8k06xm3iNljicRPXY/1AZpF9iISk2U9RvzwOE1WrJJiTtLKsc
+    +4bIIL2aS6bHzYWnsxo58VncJd8fl44vsP/3+pVSSHyzLy/LhAPFFpZgNZWKJkZq
+    w4mv8PSVAFjINcOEJ+9k3MRBxE5IU4fUeRnZAYZg1tTsv3sQACmTCiRlTBS85sRs
+    ENnvWakCgYEA+nL80NkL459vkpnw5ypia5mg6zT0sN/dpkACDd1KohNX2CnVIzro
+    Ze4MxJaSe7/3mwghVHAIsXisOv6cPf0KIKr7G4SCPeGQ/ZUQR6c08GJXjI3Mjlpp
+    yRgGWZWhLLuzS7Y7RWtAaeIosuhE2/I8BI2AMccWByvAnoTo8RT0D80CgYEA1kYq
+    w1yeyOO9Dhd3wHihQmwlSvPUWz/cx9PTDasFNH0+FZb7lAQhaj1JcZOGpCFPXsj1
+    62hErm26geigD6Ju7TI0CQaF4pHvgeMUlDQ2l8DptLw06KHnB+WjP+Xj67jTEf1u
+    icSULYskbvJizxBxKbD1/B+ovvIyrklzaNyb/fcCgYBIO937Bn7NWfC+IbQ/mBPm
+    4NpuvElOsmKlTpTJFugtstKFQBt/G8Bnla8NDDiXhJiPmFq0ldOMDDfwk/rQTikb
+    nvTpzOAbpPFCkjmt0OYN5u9FVKiI7j7QhyNdtzBTTJe74IVb0kEzyMzgPOmPXmA9
+    F+q/cKJD0zStA7yDu/1giQKBgQDIW+omrVeoXxNrttP6PJIFixw//sml3YxzqgWi
+    tTTzxNyl0X1DBa29KrufISR4GtGdvun9Co2WUPJiAQSSOf/hed0gR2Iv3ugHGzAl
+    +MDHm9KsdoQ+tw1R3A+Pc0ZxJ2zuWHzhA9jO0VnrCGkOV8CJDHinHW9rxQtQ30u0
+    VPzkNwKBgQCIHO0D+xZXGV45Oz8/74uwGXIkSidZ8aWpjn4m86IDSkRt1JRbdBQc
+    lZA+GwaK3M3Feotru30t4qbvDgmIvKgb8/Uz75ca60Y2u/qlb+kRjdY5Q2YuS0Cw
+    5Ont/EG+RX9P7u7OD3yFqFdiBnv4WyjwGf2qKcjjg6ECKLWVs5dgUQ==
+    -----END RSA PRIVATE KEY-----
+type: authserver/jwk
