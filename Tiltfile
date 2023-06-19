@@ -9,7 +9,7 @@ local("kubectl apply -f infrastructure.yml -f default-key.yml")
 # Build the auth server image using gradle
 custom_build(
     "springone/authserver",
-    command = "../gradlew bootBuildImage --imageName $EXPECTED_REF",
+    command = "./gradlew bootBuildImage --imageName $EXPECTED_REF",
     deps=["src/main", "build.gradle.kts"]
 )
 

@@ -2,13 +2,12 @@ package wf.garnier.spring.authserverk8s;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nonnull;
+
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.KeySourceException;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSelector;
 import com.nimbusds.jose.jwk.KeyUse;
@@ -27,8 +26,6 @@ import io.kubernetes.client.util.CallGeneratorParams;
 import io.kubernetes.client.util.ClientBuilder;
 import io.kubernetes.client.util.Namespaces;
 import okhttp3.OkHttpClient;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 class KubernetesJwkRepository implements JWKSource<SecurityContext> {
 
@@ -40,17 +37,15 @@ class KubernetesJwkRepository implements JWKSource<SecurityContext> {
     }
 
     @Override
-    public List<JWK> get(JWKSelector jwkSelector, SecurityContext context) throws KeySourceException {
-        boolean keyUsageIsSignature = Optional.ofNullable(jwkSelector.getMatcher().getKeyUses())
-                .stream()
-                .flatMap(Set::stream)
-                .anyMatch(use -> use.equals(KeyUse.SIGNATURE));
+    public List<JWK> get(JWKSelector jwkSelector, SecurityContext context) {
+        boolean keyUsageIsSignature = jwkSelector.getMatcher().getKeyUses() != null
+                && jwkSelector.getMatcher().getKeyUses().contains(KeyUse.SIGNATURE);
 
         var keysFromKubernetes = allKeys
                 .list()
                 .stream()
-                .map(KubernetesJwkRepository::parseJwkOrNull)
-                .filter(Objects::nonNull);
+                .map(KubernetesJwkRepository::parseJwk)
+                .flatMap(Optional::stream);
         if (keyUsageIsSignature) {
             return keysFromKubernetes.filter(k -> KeyUse.SIGNATURE.equals(k.getKeyUse()))
                     .limit(1)
@@ -60,18 +55,19 @@ class KubernetesJwkRepository implements JWKSource<SecurityContext> {
         }
     }
 
-    @Nullable
-    private static JWK parseJwkOrNull(V1Secret secret) {
+    private static Optional<JWK> parseJwk(V1Secret secret) {
         var name = secret.getMetadata().getName();
         try {
             JWK parsed = JWK.parseFromPEMEncodedObjects(new String(secret.getData().get("key.pem")));
-            return new RSAKey.Builder(parsed.toRSAKey())
-                    .keyID(name)
-                    .keyUse(getKeyUse(secret))
-                    .build();
+            return Optional.of(
+                    new RSAKey.Builder(parsed.toRSAKey())
+                            .keyID(name)
+                            .keyUse(getKeyUse(secret))
+                            .build()
+            );
         } catch (JOSEException ignored) {
         }
-        return null;
+        return Optional.empty();
     }
 
     private static KeyUse getKeyUse(V1Secret secret) {
@@ -84,7 +80,7 @@ class KubernetesJwkRepository implements JWKSource<SecurityContext> {
     }
 
 
-    @NotNull
+    @Nonnull
     private static SharedIndexInformer<V1Secret> setupKubernetesInformer() throws IOException, InterruptedException {
         final String finalPodNamespace = getNamespace();
         var apiClient = ClientBuilder.defaultClient();
@@ -115,7 +111,7 @@ class KubernetesJwkRepository implements JWKSource<SecurityContext> {
         );
 
 
-        allKeysInformer.addEventHandler(new ResourceEventHandler<V1Secret>() {
+        allKeysInformer.addEventHandler(new ResourceEventHandler<>() {
             @Override
             public void onAdd(V1Secret obj) {
                 System.out.println(message(obj, "ADDED"));
@@ -137,7 +133,7 @@ class KubernetesJwkRepository implements JWKSource<SecurityContext> {
                         .map(V1ObjectMeta::getLabels)
                         .map(l -> l.get("security.spring.io/key-usage"))
                         .orElse("unset");
-                return ("~~~~~~> %s name=[%s] usage=[%s]").formatted(method, name, usage);
+                return ("~~~~~~> %s name=[%s] security.spring.io/key-usage=[%s]").formatted(method, name, usage);
             }
         });
 

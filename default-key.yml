@@ -1,3 +1,8 @@
+# This a signing key that's installed by default
+# when booting up Tilt. It makes sure that the auth
+# server can issue tokens when the k8s-related changes
+# are made
+---
 apiVersion: v1
 kind: Secret
 metadata:
