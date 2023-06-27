@@ -6,7 +6,7 @@ metadata:
   name: #@ "signing-key-" + data.values.uuid
   namespace: authserver
   labels:
-    security.spring.io/key-usage: #@ "signing" if "signing" in data.values else "verification"
+    security.spring.io/key-usage: #@ data.values.usage if "usage" in data.values else "verification"
 stringData:
   key.pem: #@ data.values.key_pem
 type: authserver/jwk
