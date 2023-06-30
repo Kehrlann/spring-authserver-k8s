@@ -3,7 +3,7 @@
 set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-readonly usage=${KEY_USAGE:-"verification"}
+readonly usage=${KEY_USAGE:-"signing"}
 
 tmp_dir=$(mktemp -d /tmp/keys.XXX)
 openssl genrsa -out "$tmp_dir/key.pem" 2048 2>/dev/null
