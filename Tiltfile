@@ -1,10 +1,8 @@
-# Create the infrastructure, one-off when tilt boots up
-# We want a namespace to deploy stuff in
-# We also deploy the `default-key.yml` ; if it is managed by Tilt
+# Deploy the `default-key.yml` secret ; if it is managed by Tilt
 # it tends to be reapplied every time a workload updates, so we can't
 # really change it's `security.spring.io/key-usage` label to verification
 # and have it persist
-local("kubectl apply -f infrastructure.yml -f default-key.yml")
+local("kubectl apply -f default-key.yml")
 
 # Build the auth server image using gradle
 custom_build(
@@ -26,4 +24,12 @@ k8s_resource(
         "secret-reader:role",
         "read-secrets:rolebinding",
     ]
+)
+
+# Deploy the token-viewr
+k8s_yaml("token-viewer.yml")
+
+k8s_resource(
+    "token-viewer",
+    objects=["token-viewer:ingress"]
 )

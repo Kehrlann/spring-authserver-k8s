@@ -4,7 +4,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: #@ "signing-key-" + data.values.uuid
-  namespace: authserver
+  namespace: default
   labels:
     security.spring.io/key-usage: #@ data.values.usage if "usage" in data.values else "verification"
 stringData:

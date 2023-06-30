@@ -25,7 +25,7 @@ data:
         # For example, `GET ci.authservers.localhost.identity.team` takes the same path both inside and outside the
         # cluster.
         #
-        rewrite name regex (.*)\.127\.0\.0\.1\.nip\.io nginx-ingress-controller.nginx-ingress.svc.cluster.local
+        rewrite name regex (.*)\.127\.0\.0\.1\.nip\.io ingress-nginx-controller.ingress-nginx.svc.cluster.local
         # ---
     
         kubernetes cluster.local in-addr.arpa ip6.arpa {

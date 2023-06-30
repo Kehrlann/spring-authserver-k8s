@@ -5,7 +5,7 @@ metadata:
   labels:
     app: authserver
   name: authserver
-  namespace: authserver
+  namespace: default
 spec:
   replicas: 1
   selector:
@@ -28,7 +28,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: authserver
-  namespace: authserver
+  namespace: default
 spec:
   type: ClusterIP
   selector:
@@ -42,7 +42,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: authserver
-  namespace: authserver
+  namespace: default
 spec:
   rules:
     - host: authserver.127.0.0.1.nip.io
