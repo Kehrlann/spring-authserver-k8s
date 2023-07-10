@@ -1,0 +1,16 @@
+# Build the sso-client image using gradle
+custom_build(
+    "springone/sso-client",
+    command = "../gradlew :sso-client:bootBuildImage --imageName $EXPECTED_REF",
+    deps=["src/main", "build.gradle.kts"]
+)
+
+# Deploy the auth-server
+k8s_yaml(["deployment.yml"])
+
+# "Attach" the ingress
+# This avoids having an "uncategorized" resource in Tilt UI
+k8s_resource(
+    "sso-client",
+    objects=["sso-client:ingress"]
+)

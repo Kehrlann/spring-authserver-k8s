@@ -1,0 +1,56 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sso-client
+  name: sso-client
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sso-client
+  template:
+    metadata:
+      labels:
+        app: sso-client
+    spec:
+      containers:
+      - image: springone/sso-client
+        name: sso-client
+        ports:
+          - containerPort: 8080
+            name: sso-client
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sso-client
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: sso-client
+  ports:
+    - name: sso-client
+      port: 8080
+      targetPort: sso-client
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sso-client
+  namespace: default
+spec:
+  rules:
+    - host: sso-client.127.0.0.1.nip.io
+      http:
+        paths:
+          - path: "/"
+            pathType: Prefix
+            backend:
+              service:
+                name: sso-client
+                port:
+                  name: sso-client

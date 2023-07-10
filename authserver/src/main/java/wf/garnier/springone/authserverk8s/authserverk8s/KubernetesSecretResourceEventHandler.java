@@ -1,4 +1,4 @@
-package wf.garnier.spring.authserverk8s;
+package wf.garnier.springone.authserverk8s.authserverk8s;
 
 import io.kubernetes.client.informer.ResourceEventHandler;
 import io.kubernetes.client.openapi.models.V1Secret;

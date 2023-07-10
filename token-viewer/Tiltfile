@@ -1,0 +1,7 @@
+# Deploy the token-viewr
+k8s_yaml("token-viewer.yml")
+
+k8s_resource(
+    "token-viewer",
+    objects=["token-viewer:ingress"]
+)

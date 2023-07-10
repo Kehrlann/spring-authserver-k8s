@@ -1,4 +1,4 @@
-rootProject.name = "k8s-experiments"
+rootProject.name = "springone-authserver-k8s"
 
 include("authserver")
-include("k8s-experiments")
+include("sso-client")

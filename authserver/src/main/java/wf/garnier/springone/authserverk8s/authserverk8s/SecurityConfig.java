@@ -1,7 +1,4 @@
-package wf.garnier.spring.authserverk8s;
-
-import java.util.Collection;
-import java.util.List;
+package wf.garnier.springone.authserverk8s.authserverk8s;
 
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
