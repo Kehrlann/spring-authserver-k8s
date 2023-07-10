@@ -32,9 +32,11 @@ class SecurityConfig {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public SecurityFilterChain authServerFilterChain(HttpSecurity http) throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
-        http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
-                .oidc(Customizer.withDefaults());
-        http.exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")));
+        http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(Customizer.withDefaults());
+        http.oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer.jwt(Customizer.withDefaults()));
+        http.exceptionHandling(
+                exceptions -> exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
+        );
         return http.build();
     }
 
@@ -69,7 +71,7 @@ class SecurityConfig {
                         .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                         .clientId("test-client")
                         .clientSecret("{noop}test-secret")
-                        .redirectUri("http://client.127.0.0.1.nip.io/login/oauth2/code/login-client")
+                        .redirectUri("http://sso-client.127.0.0.1.nip.io/login/oauth2/code/login-client")
                         .redirectUri("http://token-viewer.127.0.0.1.nip.io/oauth2/callback")
                         .scope("openid")
                         .scope("profile")
@@ -92,7 +94,7 @@ class SecurityConfig {
     public OAuth2TokenCustomizer<JwtEncodingContext> customizer() {
         return context -> {
             context.getClaims().claim(StandardClaimNames.EMAIL, context.getPrincipal().getName() + "@example.com");
-            context.getClaims().claim(StandardClaimNames.EMAIL_VERIFIED, true   );
+            context.getClaims().claim(StandardClaimNames.EMAIL_VERIFIED, true);
             context.getClaims().claim(StandardClaimNames.PREFERRED_USERNAME, context.getPrincipal().getName());
             var groups = context.getPrincipal().getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
             context.getClaims().claim("groups", groups);

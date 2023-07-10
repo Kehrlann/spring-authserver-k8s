@@ -1,13 +1,23 @@
 package wf.garnier.springone.ssoclient;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@Controller
 class HelloController {
-
     @GetMapping("/")
-    public String hello() {
-        return "This is fine";
+    public String root() {
+        return "redirect:/index";
     }
+
+    @GetMapping("/index")
+    public String index() {
+        return "index";
+    }
+
+    @GetMapping("/logged-out")
+    public String loggedOut() {
+        return "logged-out";
+    }
+
 }
