@@ -30,6 +30,7 @@ class IndexController {
         var decoded = decoder.decode(idToken.getTokenValue());
         model.addAttribute("headers", decoded.getHeaders());
         model.addAttribute("claims", user.getClaims());
+        model.addAttribute("id_token", idToken.getTokenValue());
         return "index";
     }
 
