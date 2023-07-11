@@ -26,6 +26,7 @@ Validate that the deployment works as expected:
 - Visit `http://authserver.127.0.0.1.nip.io`
 - Visit `http://authserver.127.0.0.1.nip.io/oauth2/jwks`, you should see a single JWK
 - Get a token using `./utils/get-token.sh`
+- Visit `http://sso-client.127.0.0.1.nip.io` and do a full login flow
 
 ### Rotate JWKs
 
