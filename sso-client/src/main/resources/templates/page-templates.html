@@ -61,6 +61,25 @@
             </table>
         </div>
     </div>
+    <div th:fragment="id-token-claims" th:if="${claims}" class="row py-5 justify-content-start">
+        <div class="col">
+            <table class="table table-striped caption-top">
+                <caption>Messages</caption>
+                <thead>
+                <tr>
+                    <th scope="col">Claim name</th>
+                    <th scope="col">Claim value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="claim : ${claims}">
+                    <th scope="row" th:text="${claim.key}"></th>
+                    <td th:text="${claim.value}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 <script src="/webjars/bootstrap/js/bootstrap.bundle.min.js" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
 <script src="/webjars/jquery/jquery.min.js" th:src="@{/webjars/jquery/jquery.min.js}"></script>

@@ -21,6 +21,7 @@ class SecurityConfig {
     ClientRegistrationRepository clientRegistrationRepository() {
         return new InMemoryClientRegistrationRepository(
                 ClientRegistrations.fromIssuerLocation("http://authserver.127.0.0.1.nip.io")
+                        .clientName("Spring Auth Server")
                         .registrationId("login-client")
                         .clientId("test-client")
                         .clientSecret("test-secret")
