@@ -20,14 +20,6 @@
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="/" th:href="@{/}">Home</a>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Authorize</a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="/authorize?grant_type=authorization_code" th:href="@{/authorize?grant_type=authorization_code}">Authorization Code</a></li>
-                        <li><a class="dropdown-item" href="/authorize?grant_type=client_credentials" th:href="@{/authorize?grant_type=client_credentials}">Client Credentials</a></li>
-                        <li><a class="dropdown-item" href="/authorize?grant_type=device_code" th:href="@{/authorize?grant_type=device_code}">Device Code</a></li>
-                    </ul>
-                </li>
             </ul>
             <form class="d-flex" th:action="@{/logout}" method="post">
                 <button class="btn btn-outline-dark" type="submit">Logout</button>
@@ -64,7 +56,23 @@
     <div th:fragment="id-token-claims" th:if="${claims}" class="row py-5 justify-content-start">
         <div class="col">
             <table class="table table-striped caption-top">
-                <caption>Messages</caption>
+                <caption>Headers</caption>
+                <thead>
+                <tr>
+                    <th scope="col">Header name</th>
+                    <th scope="col">Header value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="header : ${headers}">
+                    <th scope="row" th:text="${header.key}"></th>
+                    <td th:text="${header.value}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <br>
+            <table class="table table-striped caption-top">
+                <caption>Claims</caption>
                 <thead>
                 <tr>
                     <th scope="col">Claim name</th>

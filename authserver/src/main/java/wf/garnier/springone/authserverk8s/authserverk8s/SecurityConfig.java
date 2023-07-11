@@ -72,6 +72,7 @@ class SecurityConfig {
                         .clientId("test-client")
                         .clientSecret("{noop}test-secret")
                         .redirectUri("http://sso-client.127.0.0.1.nip.io/login/oauth2/code/login-client")
+                        .redirectUri("http://127.0.0.1:8080/login/oauth2/code/login-client")
                         .redirectUri("http://token-viewer.127.0.0.1.nip.io/oauth2/callback")
                         .scope("openid")
                         .scope("profile")
