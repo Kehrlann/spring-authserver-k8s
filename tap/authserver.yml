@@ -1,0 +1,90 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: authserver-samples
+
+---
+apiVersion: sso.apps.tanzu.vmware.com/v1alpha1
+kind: AuthServer
+metadata:
+  name: authserver-sample
+  namespace: authserver-samples
+  labels:
+    name: authserver-sample
+    sample: "true"
+  annotations:
+    sso.apps.tanzu.vmware.com/allow-unsafe-identity-provider: ""
+spec:
+  tls:
+    issuerRef:
+      name: sample-self-signed-issuer
+  tokenSignature:
+    signAndVerifyKeyRef:
+      name: sample-token-signing-key
+    extraVerifyKeyRefs:
+      - name: sample-token-verification-key-1
+      - name: sample-token-verification-key-2
+  identityProviders:
+    - name: internal
+      internalUnsafe:
+        users:
+          - username: "user"
+            password: "password"
+            roles:
+              - "message.read"
+              - "message.write"
+            claims:
+              alt_address: "123 Alternate Street"
+              email: "jdoe@example.com"
+              given_name: "Jane"
+              family_name: "Doe"
+              preferred_username: "jdoe"
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: sample-self-signed-issuer
+  namespace: authserver-samples
+spec:
+  selfSigned: { }
+
+---
+apiVersion: secretgen.k14s.io/v1alpha1
+kind: RSAKey
+metadata:
+  name: sample-token-signing-key
+  namespace: authserver-samples
+spec:
+  secretTemplate:
+    type: Opaque
+    stringData:
+      key.pem: $(privateKey)
+      pub.pem: $(publicKey)
+
+---
+apiVersion: secretgen.k14s.io/v1alpha1
+kind: RSAKey
+metadata:
+  name: sample-token-verification-key-1
+  namespace: authserver-samples
+spec:
+  secretTemplate:
+    type: Opaque
+    stringData:
+      key.pem: $(privateKey)
+      pub.pem: $(publicKey)
+
+---
+apiVersion: secretgen.k14s.io/v1alpha1
+kind: RSAKey
+metadata:
+  name: sample-token-verification-key-2
+  namespace: authserver-samples
+spec:
+  secretTemplate:
+    type: Opaque
+    stringData:
+      key.pem: $(privateKey)
+      pub.pem: $(publicKey)
+
