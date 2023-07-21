@@ -1,0 +1,33 @@
+---
+apiVersion: carto.run/v1alpha1
+kind: Workload
+metadata:
+  name: sso-client
+  namespace: apps
+  labels:
+    apps.tanzu.vmware.com/workload-type: web
+    app.kubernetes.io/part-of: sso-client
+spec:
+  build:
+    env:
+      - name: "BP_JVM_VERSION"
+        value: "17"
+  params:
+    - name: live-update
+      value: "true"
+    - name: serviceAccount
+      value: default
+    - name: gitops_ssh_secret
+      value: git-secret
+  serviceClaims:
+    - name: sso-client
+      ref:
+        apiVersion: services.apps.tanzu.vmware.com/v1alpha1
+        kind: ClassClaim
+        name: sso-client
+  source:
+    git:
+      ref:
+        branch: "wip/dex"
+      url: https://github.com/Kehrlann/spring-authserver-k8s.git
+    subPath: "sso-client"
