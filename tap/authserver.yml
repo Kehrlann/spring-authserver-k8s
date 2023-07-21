@@ -1,24 +1,17 @@
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: authserver-samples
-
+#@ load("@ytt:data", "data")
 ---
 apiVersion: sso.apps.tanzu.vmware.com/v1alpha1
 kind: AuthServer
 metadata:
-  name: authserver-sample
-  namespace: authserver-samples
+  name: authserver
+  namespace: demo
   labels:
-    name: authserver-sample
-    sample: "true"
+    name: springone-authserver
+    env: "demo"
   annotations:
     sso.apps.tanzu.vmware.com/allow-unsafe-identity-provider: ""
+    sso.apps.tanzu.vmware.com/allow-client-namespaces: "demo,apps"
 spec:
-  tls:
-    issuerRef:
-      name: sample-self-signed-issuer
   tokenSignature:
     signAndVerifyKeyRef:
       name: sample-token-signing-key
@@ -40,21 +33,31 @@ spec:
               given_name: "Jane"
               family_name: "Doe"
               preferred_username: "jdoe"
----
-apiVersion: cert-manager.io/v1
-kind: Issuer
-metadata:
-  name: sample-self-signed-issuer
-  namespace: authserver-samples
-spec:
-  selfSigned: { }
+    - name: openid-provider
+      openID:
+        issuerURI: #@ "https://dex." + data.values.domain
+        clientID: appsso
+        clientSecretRef:
+          name: dex-secret
+        scopes:
+          - openid
+          - profile
+          - email
+          - groups
+        roles:
+          fromUpstream:
+            claim: "groups"
+  replicas: 1
 
+#!~~~~~~~~~~~~~~~~~~~~~~~~~
+#! 🔑 Token signing keys
+#!~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 apiVersion: secretgen.k14s.io/v1alpha1
 kind: RSAKey
 metadata:
   name: sample-token-signing-key
-  namespace: authserver-samples
+  namespace: demo
 spec:
   secretTemplate:
     type: Opaque
@@ -67,7 +70,7 @@ apiVersion: secretgen.k14s.io/v1alpha1
 kind: RSAKey
 metadata:
   name: sample-token-verification-key-1
-  namespace: authserver-samples
+  namespace: demo
 spec:
   secretTemplate:
     type: Opaque
@@ -80,7 +83,7 @@ apiVersion: secretgen.k14s.io/v1alpha1
 kind: RSAKey
 metadata:
   name: sample-token-verification-key-2
-  namespace: authserver-samples
+  namespace: demo
 spec:
   secretTemplate:
     type: Opaque
@@ -88,3 +91,29 @@ spec:
       key.pem: $(privateKey)
       pub.pem: $(publicKey)
 
+#!~~~~~~~~~~~~~~~~~~~~~~~~~
+#! 🤫 Secret for Dex
+#!~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dex-secret
+  namespace: demo
+stringData:
+  clientSecret: appsso-secret
+
+#!~~~~~~~~~~~~~~~~~~~~~~~~~
+#! 👀 Make AppSSO discoverable
+#!~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+apiVersion: sso.apps.tanzu.vmware.com/v1alpha1
+kind: ClusterWorkloadRegistrationClass
+metadata:
+  name: sso-server
+spec:
+  base:
+    spec:
+      authServerSelector:
+        matchLabels:
+          name: springone-authserver
