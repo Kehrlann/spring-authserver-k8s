@@ -2,17 +2,21 @@ package wf.garnier.springone.authserverk8s.authserverk8s;
 
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
@@ -25,12 +29,13 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
-@Configuration
-class SecurityConfig {
+@EnableWebSecurity
+@Configuration(proxyBeanMethods = false)
+public class SecurityConfig {
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    public SecurityFilterChain authServerFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain authServerSecurityFilterChain(HttpSecurity http) throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(Customizer.withDefaults());
         http.oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer.jwt(Customizer.withDefaults()));
@@ -40,26 +45,34 @@ class SecurityConfig {
         return http.build();
     }
 
-
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .authorizeHttpRequests(
-                        authorize -> {
-                            authorize.requestMatchers("/").permitAll();
-                            authorize.requestMatchers("/error").permitAll();
-                            authorize.requestMatchers("/favicon.io").permitAll();
-                            authorize.anyRequest().authenticated();
-                        }
-                )
-                .formLogin(Customizer.withDefaults())
-                .build();
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        // @formatter:off
+        http
+            .authorizeHttpRequests(authorize ->
+                authorize
+                    .requestMatchers("/assets/**", "/webjars/**").permitAll()
+                    .anyRequest().authenticated()
+            )
+            .formLogin(Customizer.withDefaults());
+        // @formatter:on
+
+        return http.build();
     }
 
-
     @Bean
-    JWKSource<SecurityContext> jwkSource() throws Exception {
-        return new KubernetesJwkRepository();
+    public UserDetailsService userDetailsService() {
+        UserDetails user1 = User.withDefaultPasswordEncoder()
+                .username("user1")
+                .password("password")
+                .roles("USER")
+                .build();
+        UserDetails adminUser = User.withDefaultPasswordEncoder()
+                .username("admin")
+                .password("password")
+                .roles("USER", "ADMIN")
+                .build();
+        return new InMemoryUserDetailsManager(user1, adminUser);
     }
 
     @Bean
@@ -73,22 +86,16 @@ class SecurityConfig {
                         .clientSecret("{noop}test-secret")
                         .redirectUri("http://sso-client.127.0.0.1.nip.io/login/oauth2/code/login-client")
                         .redirectUri("http://127.0.0.1:8080/login/oauth2/code/login-client")
-                        .redirectUri("http://token-viewer.127.0.0.1.nip.io/oauth2/callback")
-                        .scope("openid")
-                        .scope("profile")
-                        .scope("email")
+                        .scope(OidcScopes.OPENID)
+                        .scope(OidcScopes.PROFILE)
+                        .scope(OidcScopes.EMAIL)
                         .build()
         );
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return new InMemoryUserDetailsManager(
-                User.withUsername("daniel")
-                        .password("{noop}password")
-                        .roles("user")
-                        .build()
-        );
+    public JWKSource<SecurityContext> jwkSource() {
+        return new StaticJwkRepository();
     }
 
     @Bean
@@ -101,4 +108,5 @@ class SecurityConfig {
             context.getClaims().claim("groups", groups);
         };
     }
+
 }

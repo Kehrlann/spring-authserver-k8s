@@ -4,7 +4,10 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSelector;
@@ -29,8 +32,10 @@ class StaticJwkRepository implements JWKSource<SecurityContext>  {
         KeyPair keyPair = generateRsaKey();
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
         RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-        rsaKey = new RSAKey.Builder(publicKey).privateKey(privateKey)
-                .keyID("in-memory-key")
+        rsaKey = new RSAKey.Builder(publicKey)
+                .privateKey(privateKey)
+                .keyID(UUID.randomUUID().toString())
+                .issueTime(Date.from(Instant.now()))
                 .build();
         return rsaKey;
     }

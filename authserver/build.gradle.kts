@@ -13,10 +13,15 @@ repositories {
 }
 
 dependencies {
+	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-authorization-server")
 	implementation("io.kubernetes:client-java:18.0.0")
 	implementation("io.kubernetes:client-java-extended:18.0.0")
-	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.webjars:webjars-locator-core")
+	implementation("org.webjars:bootstrap:5.2.3")
+	implementation("org.webjars:popper.js:2.9.3")
+	implementation("org.webjars:jquery:3.6.4")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
