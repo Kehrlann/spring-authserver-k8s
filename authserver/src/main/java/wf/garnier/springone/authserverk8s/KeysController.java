@@ -1,4 +1,4 @@
-package wf.garnier.springone.authserverk8s.authserverk8s;
+package wf.garnier.springone.authserverk8s;
 
 import java.util.List;
 

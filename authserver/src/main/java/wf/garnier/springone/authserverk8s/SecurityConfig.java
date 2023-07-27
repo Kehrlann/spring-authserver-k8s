@@ -1,4 +1,4 @@
-package wf.garnier.springone.authserverk8s.authserverk8s;
+package wf.garnier.springone.authserverk8s;
 
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;

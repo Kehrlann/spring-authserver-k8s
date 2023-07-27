@@ -1,4 +1,4 @@
-package wf.garnier.spring.authserverk8s;
+package wf.garnier.springone.authserverk8s;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
