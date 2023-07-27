@@ -2,8 +2,8 @@
 
 ## Authserver
 
-- [ ] Add admin UI
-- [ ] Implement in-memory key rotation
+- [x] Add admin UI
+- [x] Implement in-memory key rotation
 - [ ] Implement page which displays "kubectl commands to add keys"
 
 ## TAP
