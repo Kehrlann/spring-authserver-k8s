@@ -1,0 +1,18 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          demo-client:
+            client-name: "Spring Auth Server"
+            client-id: "demo-client"
+            client-secret: "demo-secret"
+            authorization-grant-type: "authorization_code"
+            provider: "k8s-authserver"
+            scope:
+              - "openid"
+              - "profile"
+              - "email"
+        provider:
+          k8s-authserver:
+            issuer-uri: "http://authserver.127.0.0.1.nip.io"

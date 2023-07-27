@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -85,10 +84,10 @@ public class SecurityConfig {
                         .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                         .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                         .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                        .clientId("test-client")
-                        .clientSecret("{noop}test-secret")
-                        .redirectUri("http://sso-client.127.0.0.1.nip.io/login/oauth2/code/login-client")
-                        .redirectUri("http://127.0.0.1:8080/login/oauth2/code/login-client")
+                        .clientId("demo-client")
+                        .clientSecret("{noop}demo-secret")
+                        .redirectUri("http://sso-client.127.0.0.1.nip.io/login/oauth2/code/demo-client")
+                        .redirectUri("http://127.0.0.1:8080/login/oauth2/code/demo-client")
                         .scope(OidcScopes.OPENID)
                         .scope(OidcScopes.PROFILE)
                         .scope(OidcScopes.EMAIL)
