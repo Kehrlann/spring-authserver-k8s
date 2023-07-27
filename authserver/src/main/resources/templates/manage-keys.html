@@ -10,7 +10,34 @@
 <div th:replace="~{page-templates :: navbar}"></div>
 <div class="container">
     <div th:replace="~{page-templates :: error-message}"></div>
-    <div th:replace="~{page-templates :: keys-list}"></div>
+    <div th:if="${keys}" class="row py-5 justify-content-start">
+        <div class="col">
+            <table class="table table-striped caption-top">
+                <caption>Keys</caption>
+                <thead>
+                <tr>
+                    <th scope="col">Key ID</th>
+                    <th scope="col">Key Type</th>
+                    <th scope="col">Created</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="key : ${keys}">
+                    <td th:text="${key.keyID}"></td>
+                    <td th:text="${key.keyType}"></td>
+                    <td th:text="${key.issueTime}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row py-2 justify-content-start">
+        <div class="col">
+            <form class="d-flex" th:action="@{/generate-key}" method="post">
+                <button class="btn btn-outline-secondary" type="submit">Generate Key</button>
+            </form>
+        </div>
+    </div>
 </div>
 <script src="/webjars/bootstrap/js/bootstrap.bundle.min.js" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
 <script src="/webjars/jquery/jquery.min.js" th:src="@{/webjars/jquery/jquery.min.js}"></script>

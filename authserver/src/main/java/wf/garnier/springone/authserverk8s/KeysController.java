@@ -1,6 +1,9 @@
 package wf.garnier.springone.authserverk8s;
 
+import java.security.KeyPair;
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKMatcher;
@@ -12,13 +15,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class KeysController {
+    private final KeyRepository keyRepository;
     private final JWKSource<SecurityContext> jwkSource;
     private final JWKSelector jwkSelector;
 
-    public KeysController(JWKSource<SecurityContext> jwkSource) {
+    public KeysController(KeyRepository keyRepository, JWKSource<SecurityContext> jwkSource) {
+        this.keyRepository = keyRepository;
         this.jwkSource = jwkSource;
         this.jwkSelector = new JWKSelector(new JWKMatcher.Builder().build());
     }
@@ -35,6 +41,15 @@ public class KeysController {
         }
 
         return "manage-keys";
+    }
+
+    @PostMapping("/generate-key")
+    public String generateKey(Model model) {
+        KeyPair keyPair = KeyGeneratorUtils.generateRsaKey();
+        KeyRepository.AsymmetricKey asymmetricKey = new KeyRepository.AsymmetricKey(
+                UUID.randomUUID().toString(), Instant.now(), keyPair.getPrivate(), keyPair.getPublic());
+        this.keyRepository.save(asymmetricKey);
+        return listKeys(model);
     }
 
 }

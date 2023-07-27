@@ -1,5 +1,7 @@
 package wf.garnier.springone.authserverk8s;
 
+import java.util.List;
+
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
@@ -28,6 +30,7 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.util.CollectionUtils;
 
 @EnableWebSecurity
 @Configuration(proxyBeanMethods = false)
@@ -104,8 +107,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    public OAuth2TokenCustomizer<JwtEncodingContext> customizer() {
+    public OAuth2TokenCustomizer<JwtEncodingContext> customizer(KeyRepository keyRepository) {
         return context -> {
+            List<? extends KeyRepository.Key> keys = keyRepository.getKeys();
+            if (!CollectionUtils.isEmpty(keys)) {
+                String kid = keys.get(0).getId();
+                context.getJwsHeader().keyId(kid);
+            }
+
             context.getClaims().claim(StandardClaimNames.EMAIL, context.getPrincipal().getName() + "@example.com");
             context.getClaims().claim(StandardClaimNames.EMAIL_VERIFIED, true);
             context.getClaims().claim(StandardClaimNames.PREFERRED_USERNAME, context.getPrincipal().getName());
