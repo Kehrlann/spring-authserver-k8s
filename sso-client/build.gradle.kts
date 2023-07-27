@@ -34,3 +34,9 @@ tasks.withType<Test> {
 tasks.bootBuildImage {
     builder.set("dashaun/builder:tiny")
 }
+
+tasks.jar {
+    // Ensure the Spring-Cloud-Bindings buildpack participates in the build process
+    // Otherwise, there are two jars in build/lib and the buildpack backs off
+    enabled = false
+}
