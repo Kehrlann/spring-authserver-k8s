@@ -94,8 +94,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JWKSource<SecurityContext> jwkSource() {
-        return new StaticJwkRepository();
+    public KeyRepository keyRepository() {
+        return new InMemoryKeyRepository();
+    }
+
+    @Bean
+    public JWKSource<SecurityContext> jwkSource(KeyRepository keyRepository) {
+        return new DefaultJwkSource(keyRepository);
     }
 
     @Bean
