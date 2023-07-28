@@ -97,8 +97,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public KeyRepository keyRepository() {
-        return new InMemoryKeyRepository();
+    public KeyRepository keyRepository() throws Exception {
+        return new KubernetesKeyRepository();
     }
 
     @Bean

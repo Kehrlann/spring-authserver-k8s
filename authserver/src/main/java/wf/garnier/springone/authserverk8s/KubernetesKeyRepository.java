@@ -1,20 +1,16 @@
 package wf.garnier.springone.authserverk8s;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.JWKSelector;
-import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.source.JWKSource;
-import com.nimbusds.jose.proc.SecurityContext;
+import io.kubernetes.client.informer.ResourceEventHandler;
 import io.kubernetes.client.informer.SharedIndexInformer;
 import io.kubernetes.client.informer.SharedInformerFactory;
 import io.kubernetes.client.informer.cache.Lister;
@@ -26,43 +22,68 @@ import io.kubernetes.client.util.ClientBuilder;
 import io.kubernetes.client.util.Namespaces;
 import okhttp3.OkHttpClient;
 
-class KubernetesJwkRepository implements JWKSource<SecurityContext> {
+public final class KubernetesKeyRepository implements KeyRepository {
+    private final Lister<V1Secret> secrets;
 
-    private final Lister<V1Secret> allKeys;
+    public KubernetesKeyRepository() throws IOException {
+        this.secrets = setupSecretLister();
+    }
 
-    public KubernetesJwkRepository() throws IOException {
-        allKeys = setupSecretLister();
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends Key> T findKey(String id) {
+        for (Key key : getKeys()) {
+            if (key.getId().equals(id)) {
+                return (T) key;
+            }
+        }
+        return null;
     }
 
     @Override
-    public List<JWK> get(JWKSelector jwkSelector, SecurityContext context) {
-        boolean keyUsageIsSignature = jwkSelector.getMatcher().getKeyUses() != null
-                && jwkSelector.getMatcher().getKeyUses().contains(KeyUse.SIGNATURE);
-
-        var keysFromKubernetes = allKeys
-                .list()
-                .stream()
-                .sorted(Comparator.comparing((V1Secret s) -> s.getMetadata().getCreationTimestamp()).reversed())
-                .map(KubernetesJwkRepository::parseJwk)
-                .flatMap(Optional::stream);
-        if (keyUsageIsSignature) {
-            return keysFromKubernetes
-                    .limit(1)
-                    .toList();
-        } else {
-            return keysFromKubernetes.toList();
-        }
+    public List<? extends Key> getKeys() {
+        List<? extends Key> result = getConvertedKeys();
+        result.sort(Comparator.comparing(Key::getCreated).reversed());
+        return result;
     }
 
-    private static Optional<JWK> parseJwk(V1Secret secret) {
-        var name = secret.getMetadata().getName();
+    @Override
+    public void delete(String id) {
+        // No-op
+    }
+
+    @Override
+    public <T extends Key> void save(T key) {
+        // No-op
+    }
+
+    private List<? extends Key> getConvertedKeys() {
+        List<Key> keys = new ArrayList<>();
+
+        this.secrets.list().forEach(secret -> {
+            JWK jwk = parseJwk(secret);
+            if (jwk instanceof RSAKey rsaJwk) {
+                try {
+                    KeyRepository.AsymmetricKey asymmetricKey = new KeyRepository.AsymmetricKey(
+                            secret.getMetadata().getName(),
+                            secret.getMetadata().getCreationTimestamp().toInstant(),
+                            rsaJwk.toPrivateKey(),
+                            rsaJwk.toPublicKey());
+                    keys.add(asymmetricKey);
+                } catch (Exception ignored) {
+                }
+            }
+        });
+
+        return keys;
+    }
+
+    private static JWK parseJwk(V1Secret secret) {
         try {
-            JWK parsed = JWK.parseFromPEMEncodedObjects(new String(secret.getData().get("key.pem")));
-            var rsaKey = new RSAKey.Builder(parsed.toRSAKey()).keyID(name).build();
-            return Optional.of(rsaKey);
-        } catch (JOSEException ignored) {
+            return JWK.parseFromPEMEncodedObjects(new String(secret.getData().get("key.pem")));
+        } catch (Exception ignored) {
+            return null;
         }
-        return Optional.empty();
     }
 
     @Nonnull
@@ -98,7 +119,6 @@ class KubernetesJwkRepository implements JWKSource<SecurityContext> {
                 V1SecretList.class
         );
 
-
         allKeysInformer.addEventHandler(new KubernetesSecretResourceEventHandler());
 
         informerFactory.startAllRegisteredInformers();
@@ -114,6 +134,24 @@ class KubernetesJwkRepository implements JWKSource<SecurityContext> {
                 break;
             }
             Thread.sleep(100);
+        }
+    }
+
+    private static class KubernetesSecretResourceEventHandler implements ResourceEventHandler<V1Secret> {
+
+        @Override
+        public void onAdd(V1Secret obj) {
+            System.out.printf("~~~~~~~> ADDED [%s]%n", obj.getMetadata().getName());
+        }
+
+        @Override
+        public void onUpdate(V1Secret oldObj, V1Secret newObj) {
+            System.out.printf("~~~~~~~> UPDATED [%s]%n", newObj.getMetadata().getName());
+        }
+
+        @Override
+        public void onDelete(V1Secret obj, boolean deletedFinalStateUnknown) {
+            System.out.printf("~~~~~~~> DELETED [%s]%n", obj.getMetadata().getName());
         }
     }
 
