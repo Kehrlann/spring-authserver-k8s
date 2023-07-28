@@ -111,6 +111,7 @@ public class SecurityConfig {
         return context -> {
             List<? extends KeyRepository.Key> keys = keyRepository.getKeys();
             if (!CollectionUtils.isEmpty(keys)) {
+                // Assuming first key is the 'active' signing key
                 String kid = keys.get(0).getId();
                 context.getJwsHeader().keyId(kid);
             }
