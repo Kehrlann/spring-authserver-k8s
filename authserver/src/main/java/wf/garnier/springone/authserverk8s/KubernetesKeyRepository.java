@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
@@ -14,19 +13,19 @@ import io.kubernetes.client.informer.ResourceEventHandler;
 import io.kubernetes.client.informer.SharedIndexInformer;
 import io.kubernetes.client.informer.SharedInformerFactory;
 import io.kubernetes.client.informer.cache.Lister;
+import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Secret;
 import io.kubernetes.client.openapi.models.V1SecretList;
 import io.kubernetes.client.util.CallGeneratorParams;
 import io.kubernetes.client.util.ClientBuilder;
 import io.kubernetes.client.util.Namespaces;
-import okhttp3.OkHttpClient;
 
 public final class KubernetesKeyRepository implements KeyRepository {
-    private final Lister<V1Secret> secrets;
+    private final Lister<V1Secret> secretsCache;
 
     public KubernetesKeyRepository() throws IOException {
-        this.secrets = setupSecretLister();
+        this.secretsCache = setupSecretLister();
     }
 
     @SuppressWarnings("unchecked")
@@ -60,7 +59,7 @@ public final class KubernetesKeyRepository implements KeyRepository {
     private List<? extends Key> getConvertedKeys() {
         List<Key> keys = new ArrayList<>();
 
-        this.secrets.list().forEach(secret -> {
+        this.secretsCache.list().forEach(secret -> {
             JWK jwk = parseJwk(secret);
             if (jwk instanceof RSAKey rsaJwk) {
                 try {
@@ -88,13 +87,14 @@ public final class KubernetesKeyRepository implements KeyRepository {
 
     @Nonnull
     private static Lister<V1Secret> setupSecretLister() throws IOException {
+        ApiClient apiClient = ClientBuilder.defaultClient();
+        CoreV1Api coreV1Api = new CoreV1Api(apiClient);
+
         final String namespace = Namespaces.getPodNamespace();
 
-        var apiClient = ClientBuilder.defaultClient();
-        var coreV1Api = new CoreV1Api(apiClient);
-        var informerFactory = new SharedInformerFactory(apiClient);
+        SharedInformerFactory informerFactory = new SharedInformerFactory(apiClient);
 
-        var allKeysInformer = informerFactory.sharedIndexInformerFor(
+        SharedIndexInformer<V1Secret> secretsInformer = informerFactory.sharedIndexInformerFor(
                 (CallGeneratorParams params) ->
                         coreV1Api.listNamespacedSecretCall(
                                 namespace,
@@ -113,13 +113,13 @@ public final class KubernetesKeyRepository implements KeyRepository {
                 V1Secret.class,
                 V1SecretList.class
         );
-
-        allKeysInformer.addEventHandler(new KubernetesSecretResourceEventHandler());
+        secretsInformer.addEventHandler(new KubernetesSecretResourceEventHandler());
 
         informerFactory.startAllRegisteredInformers();
+
         // Optional, in our demo it will sync very fast
-        // waitForInformerSync(allKeysInformer);
-        return new Lister<>(allKeysInformer.getIndexer(), Namespaces.getPodNamespace());
+        // waitForInformerSync(secretsInformer);
+        return new Lister<>(secretsInformer.getIndexer(), namespace);
     }
 
     // Optional
