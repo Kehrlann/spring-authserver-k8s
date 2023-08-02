@@ -54,6 +54,10 @@ spec:
             claim: "groups"
           filterBy:
             - regex: ".*france.*"
+        idToken:
+          claims:
+            - fromUpstream: "unique_name"
+              toClaim: "email"
   replicas: 1
 
 #!~~~~~~~~~~~~~~~~~~~~~~~~~
