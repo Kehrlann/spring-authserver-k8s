@@ -141,17 +141,17 @@ public final class KubernetesKeyRepository implements KeyRepository {
 
         @Override
         public void onAdd(V1Secret obj) {
-            System.out.printf("~~~~~~~> ADDED [%s]%n", obj.getMetadata().getName());
+            System.out.printf("~~~~~~~> Secret [%s] added%n", obj.getMetadata().getName());
         }
 
         @Override
         public void onUpdate(V1Secret oldObj, V1Secret newObj) {
-            System.out.printf("~~~~~~~> UPDATED [%s]%n", newObj.getMetadata().getName());
+            System.out.printf("~~~~~~~> Secret [%s] updated%n", newObj.getMetadata().getName());
         }
 
         @Override
         public void onDelete(V1Secret obj, boolean deletedFinalStateUnknown) {
-            System.out.printf("~~~~~~~> DELETED [%s]%n", obj.getMetadata().getName());
+            System.out.printf("~~~~~~~> Secret [%s] deleted%n", obj.getMetadata().getName());
         }
     }
 
