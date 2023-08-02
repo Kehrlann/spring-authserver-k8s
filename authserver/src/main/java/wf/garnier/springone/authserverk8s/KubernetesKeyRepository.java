@@ -92,11 +92,6 @@ public final class KubernetesKeyRepository implements KeyRepository {
 
         var apiClient = ClientBuilder.defaultClient();
         var coreV1Api = new CoreV1Api(apiClient);
-        // TODO: required?
-        OkHttpClient httpClient =
-                apiClient.getHttpClient().newBuilder().readTimeout(0, TimeUnit.SECONDS).build();
-        apiClient.setHttpClient(httpClient);
-        // end TODO
         var informerFactory = new SharedInformerFactory(apiClient);
 
         var allKeysInformer = informerFactory.sharedIndexInformerFor(
