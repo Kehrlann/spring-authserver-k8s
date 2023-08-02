@@ -8,8 +8,6 @@ kind: Secret
 metadata:
   name: default-key
   namespace: default
-  labels:
-    security.spring.io/key-usage: signing
 stringData:
   key.pem: |-
     -----BEGIN RSA PRIVATE KEY-----

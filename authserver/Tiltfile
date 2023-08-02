@@ -1,7 +1,6 @@
 # Deploy the `default-key.yml` secret ; if it is managed by Tilt
-# it tends to be reapplied every time a workload updates, so we can't
-# really change it's `security.spring.io/key-usage` label to verification
-# and have it persist
+# it tends to be reapplied every time a workload updates, so it tends
+# to come up as a the first key in the list
 local("kubectl apply -f default-key.yml")
 
 # Build the auth server image using gradle

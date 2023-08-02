@@ -30,8 +30,7 @@ Validate that the deployment works as expected:
 
 ### Rotate JWKs
 
-- Generate a new key using `KEY_USAGE=signing ./utils/generate-key.sh`
-  - This key has label `security.spring.io/key-usage: signing` and can be used for signing JWTs
-- Apply this key to the cluster with `kubectl apply`
+- Generate a new key using `./utils/generate-key.sh`
+- Apply this key to the cluster with `./utils/generate-key.sh | kubectl apply -f -`
 - You may now delete the default key that was created for you:
   - `kubectl delete secret default-key -n authserver`

@@ -5,8 +5,6 @@ kind: Secret
 metadata:
   name: #@ "signing-key-" + data.values.uuid
   namespace: default
-  labels:
-    security.spring.io/key-usage: #@ data.values.usage if "usage" in data.values else "signing"
 stringData:
   key.pem: #@ data.values.key_pem
 type: authserver/jwk
