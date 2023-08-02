@@ -1,4 +1,10 @@
-#@ load("@ytt:data", "data")
+#@  load("@ytt:data", "data")
+#@  load("@ytt:struct", "struct")
+#@  if "azure" in data.values:
+#@     azure = data.values.azure
+#@  else:
+#@     azure = struct.encode({"client_id": "", "client_secret": "", "issuer_uri": ""})
+#@  end
 ---
 apiVersion: sso.apps.tanzu.vmware.com/v1alpha1
 kind: AuthServer
@@ -33,20 +39,21 @@ spec:
               given_name: "Jane"
               family_name: "Doe"
               preferred_username: "jdoe"
-    - name: openid-provider
+    - name: azure
       openID:
-        issuerURI: #@ "https://dex." + data.values.domain
-        clientID: appsso
+        issuerURI: #@ azure.issuer_uri
+        clientID: #@ azure.client_id
         clientSecretRef:
-          name: dex-secret
+          name: azure-secret
         scopes:
           - openid
           - profile
           - email
-          - groups
         roles:
           fromUpstream:
             claim: "groups"
+          filterBy:
+            - regex: ".*france.*"
   replicas: 1
 
 #!~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -92,16 +99,16 @@ spec:
       pub.pem: $(publicKey)
 
 #!~~~~~~~~~~~~~~~~~~~~~~~~~
-#! 🤫 Secret for Dex
+#! 🤫 Secret for identity providers
 #!~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: dex-secret
+  name: azure-secret
   namespace: demo
 stringData:
-  clientSecret: appsso-secret
+  clientSecret: #@ azure.client_secret
 
 #!~~~~~~~~~~~~~~~~~~~~~~~~~
 #! 👀 Make AppSSO discoverable

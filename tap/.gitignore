@@ -2,3 +2,6 @@
 # tap-values
 utils/*.yml
 utils/*.yaml
+
+# azure secrets
+azure-data-values.yml
