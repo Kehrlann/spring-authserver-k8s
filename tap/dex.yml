@@ -77,6 +77,10 @@ spec:
           ports:
             - containerPort: 5556
               name: web
+          resources:
+            limits:
+              cpu: 0.5
+              memory: 100M
       restartPolicy: Always
       volumes:
         - name: config
@@ -84,10 +88,6 @@ spec:
             name: dex-config
         - name: db
           emptyDir: {}
-      resources:
-        limits:
-          cpu: 0.5
-          memory: 100M
   selector:
     matchLabels:
       app: dex
