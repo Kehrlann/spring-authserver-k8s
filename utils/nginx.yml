@@ -1,3 +1,5 @@
+# Simple deployment to test the NGINX ingress. We happen to use
+# NGINX but it could be any image
 ---
 apiVersion: v1
 kind: Namespace

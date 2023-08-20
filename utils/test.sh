@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Small script to test the NGINX Ingress deployment
+
 set -euo pipefail
 
 kubectl apply -f nginx.yml
