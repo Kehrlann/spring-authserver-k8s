@@ -6,7 +6,7 @@ metadata:
   namespace: apps
 spec:
   classRef:
-    name: sso-server
+    name: test-login
   parameters:
     workloadRef:
       name: sso-client

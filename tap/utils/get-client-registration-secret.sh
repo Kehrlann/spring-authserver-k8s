@@ -3,7 +3,7 @@
 set -euo pipefail
 
 MY_SECRET=demo-client
-MY_NS=demo
+MY_NS=apps
 
 export CLIENT_ID=$(kubectl get secret $MY_SECRET -n $MY_NS -o jsonpath="{.data.client-id}" | base64 -d)
 export CLIENT_SECRET=$(kubectl get secret $MY_SECRET -n $MY_NS -o jsonpath="{.data.client-secret}" | base64 -d)
