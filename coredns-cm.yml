@@ -1,5 +1,4 @@
 ---
-# TODO explain why
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -15,14 +14,14 @@ data:
         ready
     
         # ---
-        # Rewrite all DNS requests for `*.localhost.identity.team` such that they resolve into the cluster's service for
+        # Rewrite all DNS requests for `*.127.0.0.1.nip.io` such that they resolve into the cluster's service for
         # external ingress. This is the Contour-managed, Envoy-backed Service `tanzu-system-ingress/envoy`.
         #
-        # As a result, inside the cluster requests for FQDNs `*.localhost.identity.team` resolve the same as external
+        # As a result, inside the cluster requests for FQDNs `*.127.0.0.1.nip.io` resolve the same as external
         # requests, if these FDQNs are managed by Contour-managed APIs `HTTPProxy`, `Ingress`, etc.
         # This renders custom `/etc/hosts` entries redundant which achieved a similar outcome.
         #
-        # For example, `GET ci.authservers.localhost.identity.team` takes the same path both inside and outside the
+        # For example, `GET authserver.127.0.0.1.nip.io` takes the same path both inside and outside the
         # cluster.
         #
         rewrite name regex (.*)\.127\.0\.0\.1\.nip\.io ingress-nginx-controller.ingress-nginx.svc.cluster.local
