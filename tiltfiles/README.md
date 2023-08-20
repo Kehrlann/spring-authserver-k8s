@@ -1,5 +1,7 @@
 # Tiltfiles
 
+Showcase sample tiltfiles for building a Boot image with tilt, including different setups for x86
+and ARM architecutres.
 
 ## buildpacks-liveupdate
 
