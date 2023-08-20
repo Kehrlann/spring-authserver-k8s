@@ -1,0 +1,28 @@
+---
+apiVersion: sso.apps.tanzu.vmware.com/v1alpha1
+kind: ClientRegistration
+metadata:
+  name: demo-client
+  namespace: apps
+spec:
+  authServerSelector:
+    matchLabels:
+      #! This is hard-coded, internal knowledge about ClusterUnsafeTestLogin,
+      #! and is only intended to demonstrate how to a pply a ClientRegistration
+      app.kubernetes.io/component: auth-server
+      app.kubernetes.io/created-by: controller
+      app.kubernetes.io/managed-by: sso.apps.tanzu.vmware.com
+      app.kubernetes.io/part-of: test-login
+  redirectURIs:
+    - "http://127.0.0.1:8080/login/oauth2/code/demo-client"
+  scopes:
+    - name: openid
+    - name: email
+      description: This application will be able to read your e-mail address.
+    - name: profile
+      description: This application will be able to read your profile information.
+  authorizationGrantTypes:
+    - authorization_code
+    - client_credentials
+  clientAuthenticationMethod: client_secret_basic
+  requireUserConsent: true

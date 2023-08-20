@@ -1,0 +1,28 @@
+---
+apiVersion: services.apps.tanzu.vmware.com/v1alpha1
+kind: ClassClaim
+metadata:
+  name: sso-client
+  namespace: apps
+spec:
+  classRef:
+    name: test-login
+  parameters:
+    workloadRef:
+      name: sso-client
+    displayName: "SpringOne - SSO client"
+    redirectPaths:
+      - "/login/oauth2/code/sso-client"
+    scopes:
+      - name: openid
+      - name: email
+        description: This application will be able to read your e-mail address.
+      - name: profile
+        description: This application will be able to read your profile information.
+      - name: roles
+        description: This application will be able to read the groups you belong to.
+    authorizationGrantTypes:
+      - authorization_code
+      - client_credentials
+    clientAuthenticationMethod: client_secret_basic
+    requireUserConsent: true

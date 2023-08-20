@@ -1,0 +1,7 @@
+# Ignore all YAML files in utils, so we never commit
+# tap-values
+utils/*.yml
+utils/*.yaml
+
+# azure secrets
+azure-data-values.yml
