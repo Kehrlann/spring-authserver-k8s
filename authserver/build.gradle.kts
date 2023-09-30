@@ -31,5 +31,5 @@ tasks.withType<Test> {
 
 tasks.bootBuildImage {
 	environment.put("BP_LIVE_RELOAD_ENABLED", "true")
-	builder.set("dashaun/builder:tiny")
+	builder.set("dashaun/builder:base")
 }

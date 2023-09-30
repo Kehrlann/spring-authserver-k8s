@@ -3,11 +3,21 @@
 # to come up as a the first key in the list
 local("kubectl apply -f default-key.yml")
 
+# Continuously build the java source code, watching for changes
+local_resource(
+    "continuous-build",
+    serve_cmd="../gradlew :authserver:build --continuous"
+)
+
 # Build the auth server image using gradle
 custom_build(
     "springone/authserver",
     command = "../gradlew :authserver:bootBuildImage --imageName $EXPECTED_REF",
-    deps=["src/main", "build.gradle.kts"]
+    deps=["./build/classes", "build.gradle.kts"],
+    # Enables live reload
+    live_update = [
+      sync('./build/classes/java/main', '/workspace/BOOT-INF/classes')
+    ]
 )
 
 # Deploy the auth-server
